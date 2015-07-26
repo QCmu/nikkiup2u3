@@ -12,7 +12,7 @@ files = {
   '外套':  ('coat.csv', 2),
   '连衣裙': ('dress.csv', 2),
   '发型': ('hair.csv', 2),
-  '妆容': ('makeup.csv', 1),
+  '妆容': ('makeup.csv', 2),
   '鞋子': ('shoes.csv', 2),
   '袜子': ('socks.csv', 2),
   '上装': ('tops.csv', 2),
@@ -45,6 +45,8 @@ def process(name, file, skip = 2):
     reader.next()
   out = {}
   for row in reader:
+    if len(row[0]) == 0:
+      continue # skip empty rows
     key = name
     if len(row[3]) > 0:
       key = key + "-" + row[3]

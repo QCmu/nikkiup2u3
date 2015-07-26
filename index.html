@@ -8,13 +8,35 @@
     <script type='text/javascript' charset="UTF-8" src='levels.js'></script>
     <script type='text/javascript' charset="UTF-8" src='model.js'></script>
     <script type='text/javascript' charset="UTF-8" src='nikki.js'></script>
+    <script type='text/javascript'>
+      var googletag = googletag || {};
+      googletag.cmd = googletag.cmd || [];
+      (function() {
+        var gads = document.createElement('script');
+        gads.async = true;
+        gads.type = 'text/javascript';
+        var useSSL = 'https:' == document.location.protocol;
+        gads.src = (useSSL ? 'https:' : 'http:') +
+          '//www.googletagservices.com/tag/js/gpt.js';
+        var node = document.getElementsByTagName('script')[0];
+        node.parentNode.insertBefore(gads, node);
+      })();
+    </script>
+
+    <script type='text/javascript'>
+      googletag.cmd.push(function() {
+        googletag.defineSlot('/17828477/noogler_201307/noogler_yfchen', [728, 90], 'div-gpt-ad-1433922605968-0').addService(googletag.pubads());
+        googletag.pubads().enableSingleRequest();
+        googletag.enableServices();
+      });
+    </script>
     <style>
     table
     {
       font-family: "Lucida Sans Unicode", "Lucida Grande", Sans-Serif;
       font-size: 12px;
       background: #fff;
-      margin: 45px;
+      margin: 10px 20px;
       border-collapse: collapse;
       text-align: center;
     }
@@ -26,7 +48,7 @@
       padding: 10px 8px;
       border-bottom: 2px solid #6678b1;
     }
-     td
+    td
     {
       color: #669;
       padding: 9px 8px 0px 8px;
@@ -34,6 +56,7 @@
     tbody tr:hover td
     {
       color: #009;
+      background: #eee;
     }
     td.S {
       color: #FB3;
@@ -46,6 +69,9 @@
     }
     td.C {
       color: #38F;
+    }
+    td.negative {
+      text-decoration: line-through;
     }
     div.facet {
       margin-left:10px;
@@ -84,7 +110,7 @@
     	color: #000;
     	display: block;
     	font-size: 1.2em;
-    	padding: 0 20px;
+    	padding: 0 10px;
     	border: 1px solid #fff;
     	outline: none;
     }
@@ -107,14 +133,16 @@
   <body>
     <div class='announcement'>
       Nikki's wardrobe. By Ivan's workshop<br/>
-      服装数据来自jillhx@贴吧 20150608<br/>
-      Update 20150609:<br/>
+      服装数据来自jillhx@贴吧 20150725<br/>
+      Update 20150725:<br/>
       <ul>
-        <li>根据最新的衣柜信息进行了更正</li>
-        <li>修正了若干兼容性问题</li>
+        <li>衣柜数据更新到了jillhx的20150725版本，共计：2203，占比95%</li>
+        <li>添加了仲夏夜之梦的权重及tag，因为测试数据比较少，可能会遗漏高分部件，请多包涵</li>
       </ul>
-      <strong style="color:red">每关的tag要求不一样，碰到F就不要去帖子里哭了，赶紧换一件连衣裙或者外套是正经，做任务的时候也要看看任务描述，人家文案好歹也写了那么多字呢。</strong><br/>
-      ip君要回老家结婚去了，这两周不定期更新，只修bug不加功能，报错请去<a href="http://tieba.baidu.com/p/3792563906">主贴</a><br/>
+      <strong style="color:red">由于新关卡的开放，目前尚有大量新衣服没有数据，请去<a href="http://tieba.baidu.com/p/3860789814?pid=72233997714#72233997714">这一贴</a>看看有没有可以帮到jill的地方，尽快完善衣柜，让我们少更新几次。</strong><br/>
+      衣服信息纠错请去<a href="http://tieba.baidu.com/p/3860789814">jillhx的新衣柜楼</a>汇报<br/>
+      功能错误或者有新需求请去<a href="http://tieba.baidu.com/p/3792563906">主贴</a>汇报<br/>
+      <strong style="color:red">友情提示：竞技场新关卡里镜中花水中月套装分数奇高，大家请小心对待不要被坑了</strong><br/>
     </div>
     <hr/>
     <div>
@@ -123,6 +151,7 @@
           <input type="radio" name="mode" value="filtering" onClick="changeMode(true)" checked/> 筛选
           <input type="radio" name="mode" value="ranking" onClick="changeMode(false)" /> 计分
           <select id="theme" onChange="changeTheme()" style="display: none"></select>
+          <span id="tagInfo"></span>
         </div>
         <div class='facet'>
           <div>
@@ -167,18 +196,19 @@
           </div>
         </div>
         <div>
-          <input type="checkbox" name="inventory" value="own" onClick="refreshTable()" checked />拥有
+          <input type="checkbox" name="inventory" value="own" onClick="onChangeUiFilter()" checked />拥有
           <span id='inventoryCount'> </span>
-          <input type="checkbox" name="inventory" value="missing" onClick="refreshTable()" checked /> 没有
+          <input type="checkbox" name="inventory" value="missing" onClick="onChangeUiFilter()" checked /> 没有
         </div>
       </form>
     </div>
     <hr>
-    <div id='topAccessories'>
-      [测试] 不要再去挑饰品了，直接用下面这些就可以了
-      <div id='topAccessoriesTable'>
+    <div id='shoppingCart'>
+      已选择的衣服 <input type="checkbox" id="accessoriesHelper" checked />自动选择饰品 <button onclick="clearShoppingCart()">清空购物车</button>
+      <div id='shoppingCartTable'>
       </div>
     </div>
+    <hr>
     <div id='category_container'> 
     </div>
     <div id = "clothes"></div>
@@ -196,5 +226,14 @@
     <br/>
     <button onClick="loadCustomInventory()">Update inventory</button>
     <br/>
+    <hr>
+    <div id = 'log'></div>
+    以下为广告，别点，我是用来统计流量的
+    <!-- /17828477/noogler_201307/noogler_yfchen -->
+    <div id='div-gpt-ad-1433922605968-0' style='height:90px; width:728px;'>
+      <script type='text/javascript'>
+      googletag.cmd.push(function() { googletag.display('div-gpt-ad-1433922605968-0'); });
+      </script>
+    </div>
   </body>
 </html>
